@@ -1,3 +1,8 @@
 bin
 .DS_Store
 target
+.metadata
+.settings
+*.prefs
+.classpath
+target_platforms
