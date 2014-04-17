@@ -11,7 +11,7 @@
 	</parent>
 
 	<groupId>com.eclipsesource</groupId>
-	<artifactId>com.eclipsesource.jaxrs.provider.gson</artifactId>
+	<artifactId>com.eclipsesource.jaxrs.provider.gson.r4</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 
