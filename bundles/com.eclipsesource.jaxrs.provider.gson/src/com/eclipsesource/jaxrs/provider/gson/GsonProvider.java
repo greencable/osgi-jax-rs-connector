@@ -1,5 +1,8 @@
 package com.eclipsesource.jaxrs.provider.gson;
+
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,9 +21,6 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
-import com.google.gson.Gson;
-
-
 @Provider
 @Produces( APPLICATION_JSON )
 @Consumes( APPLICATION_JSON )
@@ -33,12 +33,21 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
   }
 
   @Override
-  public long getSize( T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType  ) {
+  public long getSize( T t,
+                       Class<?> type,
+                       Type genericType,
+                       Annotation[] annotations,
+                       MediaType mediaType )
+  {
     return -1;
   }
 
   @Override
-  public boolean isWriteable( Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType ) {
+  public boolean isWriteable( Class<?> type,
+                              Type genericType,
+                              Annotation[] annotations,
+                              MediaType mediaType )
+  {
     return true;
   }
 
@@ -62,23 +71,33 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
   }
 
   @Override
-  public boolean isReadable( Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType ) {
+  public boolean isReadable( Class<?> type,
+                             Type genericType,
+                             Annotation[] annotations,
+                             MediaType mediaType )
+  {
     return true;
   }
 
   @Override
   public T readFrom( Class<T> type,
-                     Type gnericType,
+                     Type genericType,
                      Annotation[] annotations,
                      MediaType mediaType,
                      MultivaluedMap<String, String> httpHeaders,
                      InputStream entityStream ) throws IOException, WebApplicationException
   {
-    InputStreamReader reader = new InputStreamReader( entityStream, "UTF-8" );
+    InputStreamReader streamReader = new InputStreamReader( entityStream, "UTF-8" );
     try {
-      return gson.fromJson( reader, type );
+      Type jsonType;
+      if( type.equals( genericType ) ) {
+        jsonType = type;
+      } else {
+        jsonType = genericType;
+      }
+      return gson.fromJson( streamReader, jsonType );
     } finally {
-      reader.close();
+      streamReader.close();
     }
   }
 }
