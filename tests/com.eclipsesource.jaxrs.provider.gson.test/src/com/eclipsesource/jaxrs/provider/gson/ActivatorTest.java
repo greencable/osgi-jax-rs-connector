@@ -14,11 +14,12 @@ import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
+import com.eclipsesource.jaxrs.provider.gson.internal.Activator;
+
 
 public class ActivatorTest {
   
   @Test
-  @SuppressWarnings( "unchecked" )
   public void testStartRegistersProvider() throws Exception {
     Activator activator = new Activator();
     BundleContext context = mock( BundleContext.class );
@@ -29,7 +30,6 @@ public class ActivatorTest {
   }
   
   @Test
-  @SuppressWarnings( { "unchecked", "rawtypes" } )
   public void testStopUnregistersProvider() throws Exception {
     Activator activator = new Activator();
     BundleContext context = mock( BundleContext.class );

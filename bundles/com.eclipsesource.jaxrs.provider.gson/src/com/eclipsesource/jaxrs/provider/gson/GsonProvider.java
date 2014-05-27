@@ -26,10 +26,25 @@ import javax.ws.rs.ext.Provider;
 @Consumes( APPLICATION_JSON )
 public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
 
-  private final Gson gson;
+  private Gson gson;
 
   public GsonProvider() {
     gson = new Gson();
+  }
+  
+  public Gson getGson() {
+    return gson;
+  }
+  
+  public void setGson( Gson gson ) {
+    validateGson( gson );
+    this.gson = gson;
+  }
+
+  private void validateGson( Gson gson ) {
+    if( gson == null ) {
+      throw new IllegalArgumentException( "gson must not be null" );
+    }
   }
 
   @Override
@@ -60,13 +75,10 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
                        MultivaluedMap<String, Object> httpHeaders,
                        OutputStream entityStream ) throws IOException, WebApplicationException
   {
-    PrintWriter printWriter = new PrintWriter( entityStream );
-    try {
+    try( PrintWriter printWriter = new PrintWriter( entityStream ) ) {
       String json = gson.toJson( object );
       printWriter.write( json );
       printWriter.flush();
-    } finally {
-      printWriter.close();
     }
   }
 
@@ -87,8 +99,7 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
                      MultivaluedMap<String, String> httpHeaders,
                      InputStream entityStream ) throws IOException, WebApplicationException
   {
-    InputStreamReader streamReader = new InputStreamReader( entityStream, "UTF-8" );
-    try {
+    try( InputStreamReader reader = new InputStreamReader( entityStream, "UTF-8" ) ) {
       Type jsonType;
       if( type.equals( genericType ) ) {
         jsonType = type;
@@ -96,8 +107,6 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
         jsonType = genericType;
       }
       return gson.fromJson( streamReader, jsonType );
-    } finally {
-      streamReader.close();
     }
   }
 }

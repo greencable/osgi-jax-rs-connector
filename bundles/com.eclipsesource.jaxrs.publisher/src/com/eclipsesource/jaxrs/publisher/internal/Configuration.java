@@ -12,12 +12,13 @@ public class Configuration implements ManagedService {
   static final String CONFIG_SERVICE_PID = "com.eclipsesource.jaxrs.connector";
   static final String ROOT_PROPERTY = "root";
   
-  private JAXRSConnector connector;
+  private final JAXRSConnector connector;
   
   public Configuration( JAXRSConnector jaxRsConnector ) {
     this.connector = jaxRsConnector;
   }
 
+  @SuppressWarnings( "rawtypes" )
   @Override
   public void updated( Dictionary properties ) throws ConfigurationException {
     if( properties != null ) {

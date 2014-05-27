@@ -2,7 +2,7 @@
 <feature
       id="com.eclipsesource.jaxrs.provider.security.feature"
       label="OSGi - JAX-RS Security"
-      version="1.0.0.qualifier"
+      version="2.0.0.qualifier"
       provider-name="EclipseSource">
 
    <description>
@@ -22,9 +22,6 @@
          version="0.0.0"/>
 
    <requires>
-      <import plugin="javax.annotation-api"/>
-      <import plugin="javax.ws.rs-api"/>
-      <import plugin="org.glassfish.jersey.core.jersey-server"/>
       <import plugin="org.eclipse.osgi"/>
    </requires>
 
