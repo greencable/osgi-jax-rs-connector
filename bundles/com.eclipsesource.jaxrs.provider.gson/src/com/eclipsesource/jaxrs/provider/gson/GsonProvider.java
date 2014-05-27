@@ -2,8 +2,6 @@ package com.eclipsesource.jaxrs.provider.gson;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
-import com.google.gson.Gson;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,6 +19,8 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
+import com.google.gson.Gson;
+
 @Provider
 @Produces( APPLICATION_JSON )
 @Consumes( APPLICATION_JSON )
@@ -31,11 +31,11 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
   public GsonProvider() {
     gson = new Gson();
   }
-  
+
   public Gson getGson() {
     return gson;
   }
-  
+
   public void setGson( Gson gson ) {
     validateGson( gson );
     this.gson = gson;
@@ -75,7 +75,7 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
                        MultivaluedMap<String, Object> httpHeaders,
                        OutputStream entityStream ) throws IOException, WebApplicationException
   {
-    try( PrintWriter printWriter = new PrintWriter( entityStream ) ) {
+    try (PrintWriter printWriter = new PrintWriter( entityStream )) {
       String json = gson.toJson( object );
       printWriter.write( json );
       printWriter.flush();
@@ -99,14 +99,14 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
                      MultivaluedMap<String, String> httpHeaders,
                      InputStream entityStream ) throws IOException, WebApplicationException
   {
-    try( InputStreamReader reader = new InputStreamReader( entityStream, "UTF-8" ) ) {
+    try (InputStreamReader reader = new InputStreamReader( entityStream, "UTF-8" )) {
       Type jsonType;
       if( type.equals( genericType ) ) {
         jsonType = type;
       } else {
         jsonType = genericType;
       }
-      return gson.fromJson( streamReader, jsonType );
+      return gson.fromJson( reader, jsonType );
     }
   }
 }

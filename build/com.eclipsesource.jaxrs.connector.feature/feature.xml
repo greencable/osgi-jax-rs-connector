@@ -22,14 +22,14 @@
          version="0.0.0"/>
 
    <plugin
-         id="com.eclipsesource.jaxrs.publisher"
+         id="com.eclipsesource.jaxrs.publisher.r4"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.eclipsesource.jaxrs.consumer"
+         id="com.eclipsesource.jaxrs.consumer.r4"
          download-size="0"
          install-size="0"
          version="0.0.0"
