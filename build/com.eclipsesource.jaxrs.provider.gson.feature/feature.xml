@@ -22,7 +22,7 @@
          version="0.0.0"/>
 
    <plugin
-         id="com.eclipsesource.jaxrs.provider.gson"
+         id="com.eclipsesource.jaxrs.provider.gson.r4"
          download-size="0"
          install-size="0"
          version="0.0.0"

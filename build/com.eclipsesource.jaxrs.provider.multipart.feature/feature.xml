@@ -18,7 +18,7 @@
    </license>
 
    <plugin
-         id="com.eclipsesource.jaxrs.provider.multipart"
+         id="com.eclipsesource.jaxrs.provider.multipart.r4"
          download-size="0"
          install-size="0"
          version="0.0.0"
