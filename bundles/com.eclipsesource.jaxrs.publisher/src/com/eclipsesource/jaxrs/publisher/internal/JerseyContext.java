@@ -1,19 +1,20 @@
 /*******************************************************************************
- * Copyright (c) 2012 EclipseSource and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
+ * Copyright (c) 2012 EclipseSource and others. All rights reserved. This program and the
+ * accompanying materials are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Holger Staudacher - initial API and implementation
- *    Dragos Dascalita  - disbaled autodiscovery
+ * http://www.eclipse.org/legal/epl-v10.html Contributors: Holger Staudacher - initial API and
+ * implementation Dragos Dascalita - disbaled autodiscovery
  ******************************************************************************/
 package com.eclipsesource.jaxrs.publisher.internal;
 
+import java.lang.Thread.State;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import javax.print.attribute.standard.DateTimeAtCompleted;
 import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Request;
@@ -24,7 +25,6 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 
-
 public class JerseyContext {
 
   private final RootApplication application;
@@ -32,10 +32,15 @@ public class JerseyContext {
   private final HttpService httpService;
   private final String rootPath;
   private boolean isApplicationRegistered;
+  private Timer timerResource = null;
+  private long lastModification;
+  private final long maxDelay = 1000;
 
   public JerseyContext( HttpService httpService, String rootPath ) {
     this.httpService = httpService;
-    this.rootPath = rootPath == null ? "/services" : rootPath;
+    this.rootPath = rootPath == null
+                                    ? "/services"
+                                    : rootPath;
     this.application = new RootApplication();
     disableAutoDiscovery();
     this.servletContainer = new ServletContainer( ResourceConfig.forApplication( application ) );
@@ -43,23 +48,42 @@ public class JerseyContext {
 
   private void disableAutoDiscovery() {
     // don't look for implementations described by META-INF/services/*
-    this.application.addProperty(ServerProperties.METAINF_SERVICES_LOOKUP_DISABLE, false );
+    this.application.addProperty( ServerProperties.METAINF_SERVICES_LOOKUP_DISABLE, false );
     // disable auto discovery on server, as it's handled via OSGI
-    this.application.addProperty(ServerProperties.FEATURE_AUTO_DISCOVERY_DISABLE, true );
+    this.application.addProperty( ServerProperties.FEATURE_AUTO_DISCOVERY_DISABLE, true );
   }
 
   public void addResource( Object resource ) {
     getRootApplication().addResource( resource );
     registerServletWhenNotAlreadyRegistered();
-    if( isApplicationRegistered ) {
-      ClassLoader original = getContextClassloader();
+    updateServletRegistration();
+  }
+
+  void updateServletRegistration() {
+    if( timerResource == null ) {
+      timerResource = new Timer();
       try {
-        Thread.currentThread().setContextClassLoader( Request.class.getClassLoader() );
-        getServletContainer().reload( ResourceConfig.forApplication( application ) );
-      } finally {
-        resetContextClassloader( original );
+        TimerTask resourceTask = new TimerTask() {
+
+          @Override
+          public void run() {
+            if( ( System.currentTimeMillis() - lastModification ) > maxDelay ) {
+              if( isApplicationRegistered ) {
+                Thread.currentThread().setContextClassLoader( Request.class.getClassLoader() );
+                getServletContainer().reload( ResourceConfig.forApplication( application ) );
+                unregisterServletWhenNoresourcePresents();
+              }
+              timerResource.cancel();
+              timerResource = null;
+            }
+          }
+        };
+        timerResource.schedule( resourceTask, maxDelay, maxDelay );
+      } catch( IllegalStateException exc ) {
+        System.err.println( "Illegal state exception" );
       }
     }
+    lastModification = System.currentTimeMillis();
   }
 
   void registerServletWhenNotAlreadyRegistered() {
@@ -95,10 +119,7 @@ public class JerseyContext {
     ClassLoader original = getContextClassloader();
     try {
       Thread.currentThread().setContextClassLoader( Application.class.getClassLoader() );
-      httpService.registerServlet( rootPath, 
-                                   getServletContainer(), 
-                                   null, 
-                                   null );
+      httpService.registerServlet( rootPath, getServletContainer(), null, null );
     } finally {
       resetContextClassloader( original );
     }
@@ -107,18 +128,17 @@ public class JerseyContext {
   private void resetContextClassloader( ClassLoader loader ) {
     Thread.currentThread().setContextClassLoader( loader );
   }
-  
+
   public void removeResource( Object resource ) {
     getRootApplication().removeResource( resource );
-    if( isApplicationRegistered ) {
-      getServletContainer().reload( ResourceConfig.forApplication( application ) );
-    }
-    unregisterServletWhenNoresourcePresents();
+    updateServletRegistration();
   }
 
   private void unregisterServletWhenNoresourcePresents() {
     if( !getRootApplication().hasResources() ) {
-      httpService.unregister( rootPath );
+      if( httpService != null ) {
+        httpService.unregister( rootPath );
+      }
       servletContainer = new ServletContainer( ResourceConfig.forApplication( application ) );
       isApplicationRegistered = false;
     }
@@ -138,10 +158,9 @@ public class JerseyContext {
   ServletContainer getServletContainer() {
     return servletContainer;
   }
-  
+
   // For testing purpose
   RootApplication getRootApplication() {
     return application;
   }
-
 }
