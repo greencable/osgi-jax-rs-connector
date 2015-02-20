@@ -42,7 +42,6 @@
 		<module>../../bundles/com.eclipsesource.jaxrs.provider.security</module>
 		<module>../../bundles/com.eclipsesource.jaxrs.provider.sse</module>
 		<module>../../bundles/com.eclipsesource.jaxrs.provider.multipart</module>
-		<module>../../build/com.eclipsesource.jaxrs.jersey.all</module>
 		<!-- Tests -->
 		<module>../../tests/com.eclipsesource.jaxrs.publisher.test</module>
 		<module>../../tests/com.eclipsesource.jaxrs.consumer.test</module>
