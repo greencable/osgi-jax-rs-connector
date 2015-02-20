@@ -99,13 +99,7 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
                      InputStream entityStream ) throws IOException, WebApplicationException
   {
     try (InputStreamReader reader = new InputStreamReader( entityStream, "UTF-8" )) {
-      Type jsonType;
-      if( type.equals( genericType ) ) {
-        jsonType = type;
-      } else {
-        jsonType = genericType;
-      }
-      return gson.fromJson( reader, jsonType );
+      return gson.fromJson( reader, genericType != null ? genericType : type );
     }
   }
 }
