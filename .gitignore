@@ -6,3 +6,5 @@ target
 *.prefs
 .classpath
 target_platforms
+.idea
+*.iml
