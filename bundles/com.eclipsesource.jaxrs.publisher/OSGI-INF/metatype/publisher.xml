@@ -3,7 +3,7 @@
 	<OCD name="OSGi REST Publisher" id="com.eclipsesource.jaxrs.connector" description="OSGi REST Publisher Configuration">
 		<AD name="Root" default="/API" id="root" type="String" description="The root URI for publishing web services.  Defaults to /services"/>
     <AD name="Disable jersey wadl" id="disableWadl" type="Boolean" description="WADL generation through 'application.wadl' is enabled in Jersey by default. To disable this set this property to true" default="false" />
-    <AD name="Publish Delay" id="publishDelay" type="Long" description="The delay in milliseconds to wait before reloading the servlet container after a new resource was registered" default="150" />
+    <AD name="Publish Delay" id="publishDelay" type="Long" description="The delay in milliseconds to wait before reloading the servlet container after a new resource was registered" default="500" />
 	</OCD>
 	<Designate pid="com.eclipsesource.jaxrs.connector">
 		<Object ocdref="com.eclipsesource.jaxrs.connector"/>
